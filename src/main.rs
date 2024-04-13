@@ -4,14 +4,16 @@ use ratatui_templates::handler::handle_key_events;
 use ratatui_templates::tui::Tui;
 use std::io;
 use ratatui::backend::CrosstermBackend;
-use ratatui::style::Stylize;
 use ratatui::Terminal;
 use ratatui_templates::connection::get_temperature;
 
 
+use std::sync::{Arc, Mutex};
+use tokio::sync::Mutex as AsyncMutex;
+
 #[tokio::main]
 async fn main() -> AppResult<()> {
-    let mut app = App::new().await;
+    let app = Arc::new(AsyncMutex::new(App::new().await));
 
     let backend = CrosstermBackend::new(io::stderr());
     let terminal = Terminal::new(backend)?;
@@ -19,28 +21,27 @@ async fn main() -> AppResult<()> {
     let mut tui = Tui::new(terminal, EventHandler::new(100));
     tui.init()?;
 
-    while app.running {
-        // Render the user interface.
-        tui.draw(&mut app);
-
-        if app.cache == false {
-            for (index, city) in app.cities.iter().enumerate() {
-                if index < app.cities_state.selected().unwrap() + 5 || index >= app.cities.len() - 5{
-                    if !app.cities_temperature.contains_key(city) {
-                        let city_info = get_temperature(city.to_string()).await.unwrap();
-                        app.cities_temperature.insert(city.to_string(), city_info);
-                    }
+    let app_clone = Arc::clone(&app);
+    tokio::spawn(async move {
+        loop {
+           if !app_clone.lock().await.cache {
+                let next_5_cities = app_clone.lock().await.get_the_next_5_cities();
+                for city in next_5_cities {
+                    let city_info = get_temperature(city.to_string()).await.unwrap();
+                    app_clone.lock().await.cities_temperature.insert(city.to_string(), city_info);
                 }
-            }
-            app.cache = true;
+           }
         }
+    });
 
-        // Handle events.
+    while app.lock().await.running {
+        let mut app_lock = app.lock().await;
+        tui.draw(&mut *app_lock);
+
         if let event = tui.events.next().await? {
-
             match event {
                 Event::Key(key_event) => {
-                    handle_key_events(key_event, &mut app)?;
+                    handle_key_events(key_event, &mut *app_lock)?;
                 }
                 _ => {}
             }

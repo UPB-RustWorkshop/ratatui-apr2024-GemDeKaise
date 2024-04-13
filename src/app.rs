@@ -53,6 +53,17 @@ impl App {
         self.cities.get(self.cities_state.selected().unwrap())
     }
 
+    pub fn get_the_next_5_cities(&self) -> Vec<String> {
+        let selected = self.cities_state.selected().unwrap();
+        let mut next_5_cities = vec![];
+        for i in selected..selected + 5 {
+            if i < self.cities.len() {
+                next_5_cities.push(self.cities[i].clone());
+            }
+        }
+        next_5_cities
+    }
+
     pub fn next_city(&mut self) {
         let i = match self.cities_state.selected() {
             Some(i) => {

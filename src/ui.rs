@@ -161,9 +161,18 @@ pub fn render(app: &mut App, frame: &mut Frame) {
 
     // based on the selected city, display the weather info
     if let Some(selected_city) = app.get_selected_city() {
-        let city_info = app.cities_temperature.get(selected_city).unwrap();
+        let city_info = app.cities_temperature.get(selected_city);
 
-        render_city_info(frame, layout[1], city_info);
+        if let Some(city_info) = city_info {
+            render_city_info(frame, layout[1], city_info);
+        } else {
+            let loading = Paragraph::new("Loading...")
+                .block(Block::default().title("Loading").borders(Borders::ALL))
+                .alignment(Alignment::Center)
+                .wrap(Wrap { trim: true });
+
+            frame.render_widget(loading, layout[1]);
+        }
     }
 
 

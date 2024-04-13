@@ -25,7 +25,7 @@ async fn main() -> AppResult<()> {
     tokio::spawn(async move {
         loop {
            if !app_clone.lock().await.cache {
-                let next_5_cities = app_clone.lock().await.get_the_next_5_cities();
+                let next_5_cities = app_clone.lock().await.get_update_cities();
                 for city in next_5_cities {
                     let city_info = get_temperature(city.to_string()).await.unwrap();
                     app_clone.lock().await.cities_temperature.insert(city.to_string(), city_info);

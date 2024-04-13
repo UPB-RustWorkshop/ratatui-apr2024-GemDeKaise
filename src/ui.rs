@@ -136,6 +136,19 @@ pub fn render(app: &mut App, frame: &mut Frame) {
         .constraints([Constraint::Percentage(50), Constraint::Percentage(50)].as_ref())
         .split(area);
 
+    // split layout[0] intro 90 10 to add help for the commands (key_down and q to close )
+    let new_layout = Layout::default()
+        .direction(Direction::Vertical)
+        .constraints([Constraint::Percentage(90), Constraint::Percentage(10)].as_ref())
+        .split(layout[0]);
+
+    // create help text
+    let help_text = Paragraph::new("Use arrow keys to navigate, 'q' to quit")
+        .block(Block::default().title("Help").borders(Borders::ALL))
+        .alignment(Alignment::Center)
+        .wrap(Wrap { trim: true });
+
+    frame.render_widget(help_text, new_layout[1]);
 
     let cities: Vec<ListItem> =
         app.cities.iter().map(|city| ListItem::new(city.clone())).collect();
@@ -155,7 +168,7 @@ pub fn render(app: &mut App, frame: &mut Frame) {
                     .bg(Color::DarkGray),
             )
             .highlight_symbol(">> "),
-        layout[0],
+        new_layout[0],
         &mut app.cities_state,
     );
 

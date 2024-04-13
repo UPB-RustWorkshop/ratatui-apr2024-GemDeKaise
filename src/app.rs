@@ -53,15 +53,27 @@ impl App {
         self.cities.get(self.cities_state.selected().unwrap())
     }
 
-    pub fn get_the_next_5_cities(&self) -> Vec<String> {
+    pub fn get_update_cities(&self) -> Vec<String> {
         let selected = self.cities_state.selected().unwrap();
-        let mut next_5_cities = vec![];
+        let mut update_cities = vec![];
         for i in selected..selected + 5 {
             if i < self.cities.len() {
-                next_5_cities.push(self.cities[i].clone());
+                update_cities.push(self.cities[i].clone());
+            } else {
+                update_cities.push(self.cities[i - self.cities.len()].clone());
             }
         }
-        next_5_cities
+
+        let size = selected as i32 - 5;
+        for i in size..selected as i32 {
+            if i >= 0 {
+                update_cities.push(self.cities[i as usize].clone());
+            } else {
+                update_cities.push(self.cities[(self.cities.len() as i32 + i) as usize].clone());
+            }
+        }
+
+        update_cities
     }
 
     pub fn next_city(&mut self) {

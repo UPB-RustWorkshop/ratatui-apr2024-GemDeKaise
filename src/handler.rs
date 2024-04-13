@@ -1,5 +1,6 @@
 use crate::app::{App, AppResult};
 use crossterm::event::KeyEvent;
+use crate::connection::get_temperature;
 
 /// Handles the key events and updates the state of [`App`].
 pub fn handle_key_events(key_event: KeyEvent, app: &mut App) -> AppResult<()> {

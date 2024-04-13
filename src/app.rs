@@ -1,7 +1,7 @@
 use std::collections::HashMap;
 use std::error;
 use ratatui::widgets::{ListState, StatefulWidget};
-use crate::connection::get_temperature;
+use crate::connection::{CityInfo, get_cities, get_temperature};
 
 /// Application result type.
 pub type AppResult<T> = Result<T, Box<dyn error::Error>>;
@@ -11,32 +11,41 @@ pub type AppResult<T> = Result<T, Box<dyn error::Error>>;
 pub struct App {
     /// Is the application running?
     pub running: bool,
+    pub cache: bool,
     pub cities: Vec<String>,
-    pub cities_temperature: HashMap<String, f64>,
+    pub cities_temperature: HashMap<String, CityInfo>,
     pub cities_state: ListState
 }
 
 impl App {
     /// Constructs a new instance of [`App`].
     pub async fn new() -> Self {
-        let cities = vec!["Bucuresti", "Pitesti"];
+        // let cities = vec!["Bucuresti", "Pitesti"];
+        // get the cities from http://34.116.205.113:3000/cities get endpoint
+        let cities = get_cities().await.unwrap();
         let mut cities_temperature = HashMap::new();
 
-        for (index, city) in cities.iter().enumerate() {
-            let city_info = get_temperature(city.to_string()).await.unwrap();
-            cities_temperature.insert(city.to_string(), city_info.temperature);
-        }
 
         let mut state = ListState::default();
         if !cities.is_empty() {
             state.select(Some(0));
         }
 
+
+        // cache the first 3 cities and the last 3 cities
+        for (index, city) in cities.iter().enumerate() {
+            if index < 5 || index >= cities.len() - 5 {
+                let city_info = get_temperature(city.to_string()).await.unwrap();
+                cities_temperature.insert(city.to_string(), city_info);
+            }
+        }
+
         Self {
             running: true,
             cities: cities.iter().map(|city| city.to_string()).collect(),
             cities_temperature,
-            cities_state: state
+            cities_state: state,
+            cache: false
         }
     }
 
@@ -56,6 +65,7 @@ impl App {
             None => 0,
         };
         self.cities_state.select(Some(i));
+        self.cache = false;
     }
 
     pub fn previous_city(&mut self) {
@@ -70,5 +80,6 @@ impl App {
             None => 0,
         };
         self.cities_state.select(Some(i));
+        self.cache = false;
     }
 }

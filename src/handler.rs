@@ -12,6 +12,14 @@ pub fn handle_key_events(key_event: KeyEvent, app: &mut App) -> AppResult<()> {
         crossterm::event::KeyCode::Char('m') => {
             println!("hello rust workshop!");
         }
+
+        crossterm::event::KeyCode::Down => {
+            app.next_city();
+        }
+
+        crossterm::event::KeyCode::Up => {
+            app.previous_city();
+        }
         _ => {}
     }
     Ok(())

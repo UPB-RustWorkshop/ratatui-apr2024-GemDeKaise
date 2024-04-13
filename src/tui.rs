@@ -52,6 +52,8 @@ impl<B: Backend> Tui<B> {
     pub fn draw(&mut self, app: &mut App) {
         // [`Draw`]: ratatui::Terminal::draw
         // [`rendering`]: crate::ui:render
+
+        self.terminal.draw(|f| ui::render(app, f)).expect("TODO: panic message");
     }
 
     /// Resets the terminal interface.

@@ -6,29 +6,17 @@ use std::io;
 use ratatui::backend::CrosstermBackend;
 use ratatui::style::Stylize;
 use ratatui::Terminal;
+use ratatui_templates::connection::get_temperature;
 
 #[tokio::main]
 async fn main() -> AppResult<()> {
-    // Create an application.
-    let mut app = App::new();
+    let mut app = App::new().await;
 
-    // Initialize the terminal user interface.
     let backend = CrosstermBackend::new(io::stderr());
     let terminal = Terminal::new(backend)?;
 
-    // TODO:  the terminal user interface
     let mut tui = Tui::new(terminal, EventHandler::new(10));
-    
-    // TODO: init the terminal
     tui.init()?;
-
-    // Start the main loop.
-    // while app.running {
-        // TODO: Render the user interface.
-
-        // TODO: Handle events.
-        
-    // }
 
     while app.running {
         // Render the user interface.
@@ -46,8 +34,6 @@ async fn main() -> AppResult<()> {
         }
     }
 
-    // TODO: Reset the terminal if the app has been terminated
     tui.exit()?;
-
     Ok(())
 }

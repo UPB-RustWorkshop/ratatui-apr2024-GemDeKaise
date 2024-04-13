@@ -26,7 +26,7 @@ pub struct EventHandler {
     /// Event sender channel.
     sender: mpsc::UnboundedSender<Event>,
     /// Event receiver channel.
-    receiver: mpsc::UnboundedReceiver<Event>,
+    pub receiver: mpsc::UnboundedReceiver<Event>,
     /// Event handler thread.
     handler: tokio::task::JoinHandle<()>,
 }
@@ -57,6 +57,9 @@ impl EventHandler {
                   }
                   Some(Ok(evt)) = crossterm_event => {
                     match evt {
+                            CrosstermEvent::Key(key_event) => {
+                            _sender.send(Event::Key(key_event)).unwrap();
+                        }
                       _ => {}
                     }
                   }

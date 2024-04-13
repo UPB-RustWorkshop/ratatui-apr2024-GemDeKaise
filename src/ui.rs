@@ -9,18 +9,21 @@ pub fn render(app: &mut App, frame: &mut Frame) {
     // - https://github.com/ratatui-org/ratatui/tree/master/examples
     
     // TODO: Split the layout
-    // let [area1, area2, area3 ...] = 
+    // let [area1, area2, area3 ...] =
+    let area = frame.size();
 
     // TODO: get the list of cities
     // let cities: Vec<ListItem> =
-    // let list_component = 
+    // let list_component =
 
     // TODO: render the list of cities
     // frame.render_widget(list_component, area);
 
 
     // TODO: Create the weather info component
-    // let weather_info = 
+    // let weather_info =
+
+    let weather_info = "Weather Info";
 
     // TODO: Render the weather info component
     // frame.render_widget(weather_info, area);

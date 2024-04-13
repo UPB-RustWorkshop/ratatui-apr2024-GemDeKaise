@@ -5,7 +5,13 @@ use crossterm::event::KeyEvent;
 pub fn handle_key_events(key_event: KeyEvent, app: &mut App) -> AppResult<()> {
     match key_event.code {
         // TODO: define actions for quitting the app
+        crossterm::event::KeyCode::Char('q') => {
+            app.running = false;
+        }
         // TODO: define actions for apps functionalities
+        crossterm::event::KeyCode::Char('m') => {
+            println!("hello rust workshop!");
+        }
         _ => {}
     }
     Ok(())
